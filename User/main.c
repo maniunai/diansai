@@ -102,17 +102,17 @@ void Task3(void *pvParameters)
 
         // 3. 计算位置差
         diff_pulse = target_pulse - motor_current_pulse;
-            if (diff_pulse > 0)
-            {
-                PWM_Start_Pulse(1, diff_pulse, 1600, 1000);
-            }
-            else if (diff_pulse < 0)
-            {
-                PWM_Start_Pulse(0, -diff_pulse, 1600, 1000);
-            }
+        if (diff_pulse > 0)
+        {
+            PWM_Start_Pulse(1, diff_pulse, 1600, 1000);
+        }
+        else if (diff_pulse < 0)
+        {
+            PWM_Start_Pulse(0, -diff_pulse, 1600, 1000);
+        }
 
-            // ✅【关键修复】发完脉冲再更新当前位置
-            motor_current_pulse = target_pulse;
+        // ✅【关键修复】发完脉冲再更新当前位置
+        motor_current_pulse = target_pulse;
         // OLED 显示
         xSemaphoreTake(oled, portMAX_DELAY);
         OLED_ShowSignedNum(1, 6, encoder_pos, 5);
