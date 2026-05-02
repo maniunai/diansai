@@ -30,7 +30,7 @@ int main(void)
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
     OLED_Init();    // I2C1,PB8,PB9,AFIO
     GPIOBSP_Init(); // PB14,EXTI,NVIV分组
-    // AD_Init();           //ADC1,PA0,PA1,PA2,PA3
+    AD_Init();           //ADC1,PA0,PA1,PA2,PA3
     Key_Init();     // PB1,11,13,14
     PWM_Init();     // TIM4,PB3,4,5,6,7
     Encoder_Init(); // TIM3,PA6,7
