@@ -1,27 +1,31 @@
 # ========== Keil MDK 编译输出 ==========
-/Objects/          # .o, .d, .crf, .axf 等目标文件和可执行文件
-/Listings/         # .lst, .map 列表文件
-DebugConfig/       # 调试配置
+/Objects/
+/Listings/
+DebugConfig/
 
 # ========== 用户配置文件（不要提交你的个人设置） ==========
-*.uvguix.*         # Keil 用户界面布局（如 Project.uvguix.Admin, Project.uvguix.KKK）
-Project.uvoptx     # Keil 选项配置（包含个人设置）
+*.uvguix.*
+Project.uvoptx
 
 # ========== IDE/编辑器配置 ==========
-/.vscode/          # VS Code 配置（tasks.json 包含了你的本地路径）
-/.eide/            # EIDE 插件配置
-/.settings/
-*.code-workspace   # VS Code 工作区文件
+.vscode/
+.eide/
+.settings/
+*.code-workspace
 
 # ========== 系统生成文件 ==========
-*.scvd             # Event Recorder 描述文件
-RTE_Components.h   # RTE 自动生成文件
+EventRecorderStub.scvd
+RTE_Components.h
 
 # ========== 编译中间文件 ==========
-/build/
-/bin/
-/obj/
-/out/
+build/
+bin/
+obj/
+out/
+
+# ========== AI/智能辅助工具 ==========
+.claude/
+.em_skill.json
 
 # ========== EIDE 模板文件 ==========
 *.ept
