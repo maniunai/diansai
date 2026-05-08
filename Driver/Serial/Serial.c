@@ -124,16 +124,6 @@ void Serial_SendNumber(uint32_t Number, uint8_t Length)
 	}
 }
 
-/**
-  * 函    数：使用printf需要重定向的底层函数
-  * 参    数：保持原始格式即可，无需变动
-  * 返 回 值：保持原始格式即可，无需变动
-  */
-int fputc(int ch, FILE *f)
-{
-	Serial_SendByte(ch);			//将printf的底层重定向到自己的发送字节函数
-	return ch;
-}
 
 /**
   * 函    数：自己封装的prinf函数

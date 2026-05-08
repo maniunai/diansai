@@ -2,6 +2,7 @@
 #define __NRF24L01_H
 
 #include "NRF24L01_Define.h"
+#include <stdint.h>
 
 /*外部可调用全局数组***********/
 
@@ -12,7 +13,6 @@ extern uint8_t NRF24L01_RxAddress[];
 extern uint8_t NRF24L01_RxPacket[];
 
 /***********外部可调用全局数组*/
-
 
 /*函数声明*********************/
 
@@ -40,9 +40,7 @@ void NRF24L01_UpdateRxAddress(void);
 
 /*********************函数声明*/
 
-
 #endif
-
 
 /*****************江协科技|版权所有****************/
 /*****************jiangxiekeji.com*****************/

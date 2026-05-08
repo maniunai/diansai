@@ -10,7 +10,7 @@ __IO uint32_t uwTick_Key_Set_Point = 0;
 uint8_t ucKey_LongPress = 2;
 uint32_t uwTick_Key_LongStart = 0;
 int32_t CountSenser_count;
-uint16_t speed = 0;
+int16_t speed = 0;
 float x, y1, y2;
 TaskHandle_t Task1Handle;
 TaskHandle_t Task2Handle;
@@ -28,17 +28,10 @@ void Task5(void *pvParameters);
 int main(void)
 {
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-    OLED_Init();    // I2C1,PB8,PB9,AFIO
-    GPIOBSP_Init(); // PB14,EXTI,NVIV分组
-    AD_Init();           //ADC1,PA0,PA1,PA2,PA3
-    Key_Init();     // PB1,11,13,14
-    PWM_Init();     // TIM4,PB3,4,5,6,7
-    Encoder_Init(); // TIM3,PA6,7
-    Timer_Init();   // TIM2,NVIC
-    // NRF24L01_Init();        //PA0,1,2,3,4
-    Serial_Init(); // PA2,3
+    BSP_Init(); // 统一初始化所有已使能的外设
     oled = xSemaphoreCreateMutex();
     g_AdcQueue = xQueueCreate(4, sizeof(uint16_t));
+    Emoter_SetDuty(50);
     xTaskCreate(Task1, "Task1", 128, NULL, 2, &Task1Handle);
     xTaskCreate(Task2, "Task2", 128, NULL, 2, &Task2Handle);
     xTaskCreate(Task3, "Task3", 128, NULL, 2, &Task3Handle);
@@ -72,7 +65,7 @@ void Task1(void *pvParameters)
             // OLED_ShowNum(1, 6, 50 + (AD_Value[0] * (50000 - 50)) / 4095, 5);
             xSemaphoreGive(oled);
         }
-        // vTaskDelay(1);
+        vTaskDelay(1);
     }
 }
 void Task2(void *pvParameters)
@@ -84,42 +77,52 @@ void Task2(void *pvParameters)
         {
             xQueueSend(g_AdcQueue, &AD_Value[i], portMAX_DELAY);
         }
-        // vTaskDelay(1);
+        vTaskDelay(1);
     }
 }
+
 void Task3(void *pvParameters)
 {
-    int32_t encoder_pos = 0;
-    int32_t target_pulse = 0;
-    int32_t diff_pulse = 0;
-    int32_t motor_current_pulse = 0; // 电机当前累计脉冲
+    /*
+        int32_t encoder_pos = 0;
+        int32_t target_pulse = 0;
+        int32_t diff_pulse = 0;
+        int32_t motor_current_pulse = 0; // 电机当前累计脉冲
+        while (1)
+        {
+            // 1. 读编码器位置
+            encoder_pos = Encoder_Getpost();
+            // 2. 计算电机目标脉冲
+            target_pulse = encoder_pos * 200;
+
+            // 3. 计算位置差
+            diff_pulse = target_pulse - motor_current_pulse;
+            if (diff_pulse > 0)
+            {
+                PWM_Start_Pulse(1, diff_pulse, 1600, 1000);
+            }
+            else if (diff_pulse < 0)
+            {
+                PWM_Start_Pulse(0, -diff_pulse, 1600, 1000);
+            }
+
+            // ✅【关键修复】发完脉冲再更新当前位置
+            motor_current_pulse = target_pulse;
+            // OLED 显示
+            xSemaphoreTake(oled, portMAX_DELAY);
+            OLED_ShowSignedNum(1, 6, encoder_pos, 5);
+            OLED_ShowSignedNum(2, 6, motor_current_pulse, 5);
+            OLED_ShowSignedNum(3, 6, diff_pulse, 5);
+            xSemaphoreGive(oled);
+
+            vTaskDelay(1);
+        }
+        */
     while (1)
     {
-        // 1. 读编码器位置
-        encoder_pos = Encoder_Getpost();
-        // 2. 计算电机目标脉冲
-        target_pulse = encoder_pos * 200;
-
-        // 3. 计算位置差
-        diff_pulse = target_pulse - motor_current_pulse;
-        if (diff_pulse > 0)
-        {
-            PWM_Start_Pulse(1, diff_pulse, 1600, 1000);
-        }
-        else if (diff_pulse < 0)
-        {
-            PWM_Start_Pulse(0, -diff_pulse, 1600, 1000);
-        }
-
-        // ✅【关键修复】发完脉冲再更新当前位置
-        motor_current_pulse = target_pulse;
-        // OLED 显示
         xSemaphoreTake(oled, portMAX_DELAY);
-        OLED_ShowSignedNum(1, 6, encoder_pos, 5);
-        OLED_ShowSignedNum(2, 6, motor_current_pulse, 5);
-        OLED_ShowSignedNum(3, 6, diff_pulse, 5);
+        OLED_ShowSignedNum(1, 6, speed, 4);
         xSemaphoreGive(oled);
-
         vTaskDelay(1);
     }
 }
@@ -211,14 +214,30 @@ void Task5(void *pvParameters)
             xSemaphoreGive(oled);
         }
 
-        // vTaskDelay(200);
+        vTaskDelay(2);
     }
+}
+/**
+ * 函    数：使用printf需要重定向的底层函数
+ * 参    数：保持原始格式即可，无需变动
+ * 返 回 值：保持原始格式即可，无需变动
+ */
+int fputc(int ch, FILE *f)
+{
+    Serial_SendByte(ch); // 将printf的底层重定向到自己的发送字节函数
+    return ch;
 }
 void TIM2_IRQHandler(void)
 {
+    static int time = 0;
     if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) // 判断是否是TIM2的更新事件触发的中断
     {
-        // speed = Encoder_Get();                      // 每隔固定时间段读取一次编码器计数增量值，即为速度值
+        time++;
+        if (time >= 10)
+        {
+            speed = Encoder_Get();
+            time = 0;
+        } // 每隔固定时间段读取一次编码器计数增量值，即为速度值
         Key_Tick();
         TIM_ClearITPendingBit(TIM2, TIM_IT_Update); // 清除TIM2更新事件的中断标志位
     }

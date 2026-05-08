@@ -42,7 +42,7 @@ int16_t Encoder_Get(void)
     /*使用Temp变量作为中继，目的是返回CNT后将其清零*/
     int16_t Temp;
     Temp = (int16_t)TIM_GetCounter(TIM3);
-    TIM_SetCounter(TIM3, 10);
+    TIM_SetCounter(TIM3, 0);
     return Temp;
 }
 int16_t Encoder_Getpost(void)
