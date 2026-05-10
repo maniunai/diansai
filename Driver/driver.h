@@ -18,7 +18,7 @@
 // #define EN_MOTOR   // 电机  使能(TIM2,AFIO,PB3,PB4,PB5,PB6,PB7)
 //#define EN_ENCODER // 编码器 使能(TIM3,PA6,PA7)
 //#define EN_SERIAL  // 串口  使能(USART2,PA2,PA3)
-// #define EN_NRF24L01//NRF24L01   使能(PA0,PA1,PA2,PA3)
+#define EN_NRF24L01//NRF24L01   使能(PA0,PA1,PA2,PA3)
 // #define EN_EMOTER  //编码电机   使能(PA2,PA5,TIM2)
 //#define EN_ADC     //ADC    使能(PB14,ADC1,DMA1,PA0,PA1,PA2,PA3)
 
